@@ -4,6 +4,14 @@
 # ══════════════════════════════════════════════════════════════
 set -e
 
+# libgomp TLS 할당 오류 방지 (ARM64/M1 Pro + PyTorch)
+# 시스템 libgomp를 먼저 찾아서 preload
+GOMP_PATH=$(find /usr/lib -name "libgomp.so.1" 2>/dev/null | head -1)
+if [ -n "$GOMP_PATH" ]; then
+    export LD_PRELOAD="$GOMP_PATH"
+    echo "[entrypoint] LD_PRELOAD=$GOMP_PATH"
+fi
+
 # ROS 환경 소싱
 source /opt/ros/noetic/setup.bash
 source /catkin_ws/devel/setup.bash

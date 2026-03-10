@@ -18,6 +18,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV ROS_WS=/catkin_ws
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+# libgomp TLS 할당 오류 방지 (ARM64/M1 Pro + PyTorch)
+ENV LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
 
 # ── 시스템 패키지 설치 ──
 RUN apt-get update && apt-get install -y --no-install-recommends \
