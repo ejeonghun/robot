@@ -34,12 +34,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# PyTorch bundled libgomp TLS 충돌 방지: 시스템 libgomp를 먼저 로드
-RUN GOMP=$(find /usr/lib -name "libgomp.so.1" 2>/dev/null | head -1) && \
-    echo "LD_PRELOAD=${GOMP}" >> /etc/environment && \
-    echo "Found system libgomp: ${GOMP}"
-ENV LD_PRELOAD=""
-
 # ── Python 패키지 설치 ──
 COPY requirements.txt /tmp/requirements.txt
 RUN pip3 install --no-cache-dir -r /tmp/requirements.txt && \

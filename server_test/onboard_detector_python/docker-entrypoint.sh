@@ -4,12 +4,14 @@
 # ══════════════════════════════════════════════════════════════
 set -e
 
-# libgomp TLS 할당 오류 방지 (ARM64/M1 Pro + PyTorch)
-# 시스템 libgomp를 먼저 찾아서 preload
-GOMP_PATH=$(find /usr/lib -name "libgomp.so.1" 2>/dev/null | head -1)
-if [ -n "$GOMP_PATH" ]; then
-    export LD_PRELOAD="$GOMP_PATH"
-    echo "[entrypoint] LD_PRELOAD=$GOMP_PATH"
+# PyTorch bundled libgomp TLS 충돌 — 해당 .so를 프로세스 시작 전에 preload
+TORCH_GOMP=$(find /usr/local/lib -path "*/torch.libs/libgomp*" 2>/dev/null | head -1)
+if [ -z "$TORCH_GOMP" ]; then
+    TORCH_GOMP=$(find /usr/lib -name "libgomp.so.1" 2>/dev/null | head -1)
+fi
+if [ -n "$TORCH_GOMP" ]; then
+    export LD_PRELOAD="$TORCH_GOMP"
+    echo "[entrypoint] LD_PRELOAD=$TORCH_GOMP"
 fi
 
 # ROS 환경 소싱
