@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ros:noetic-desktop-full
+FROM --platform=linux/amd64 osrf/ros:noetic-desktop-full
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV ROS_WS=/catkin_ws
