@@ -1,0 +1,29 @@
+# 0) (최초 1회) docker-compose.m1.yml의 rosbag 마운트 경로를 본인 경로로 수정
+# 예: /Users/junghunlee/Downloads/robot_src/robot
+# volumes:
+#   - /Users/junghunlee/Downloads/robot_src/robot:/data/rosbags:ro
+
+# 1) XQuartz 실행 + X11 허용
+open -a XQuartz
+export DISPLAY=:0
+/opt/X11/bin/xhost + 127.0.0.1
+
+# 2) 컨테이너 재기동 (이미지 변경 없으면 build 생략 가능)
+docker compose -f docker-compose.m1.yml up -d
+
+# 3) roscore 로그 확인 (현재 compose는 roscore 자동 실행)
+docker compose -f docker-compose.m1.yml logs -f
+
+
+
+# A: rosbag
+docker compose -f docker-compose.m1.yml exec ros-noetic bash -lc \
+"source /opt/ros/noetic/setup.bash && source /catkin_ws/devel/setup.bash && rosbag play -l /data/rosbags/corridor_demo.bag"
+
+# B: detector launch
+docker compose -f docker-compose.m1.yml exec ros-noetic bash -lc \
+"source /opt/ros/noetic/setup.bash && source /catkin_ws/devel/setup.bash && roslaunch onboard_detector run_detector.launch"
+
+# C: RViz GUI (XQuartz로 표시)
+docker compose -f docker-compose.m1.yml exec ros-noetic bash -lc \
+"source /opt/ros/noetic/setup.bash && source /catkin_ws/devel/setup.bash && rviz"
