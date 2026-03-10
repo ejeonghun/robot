@@ -1,0 +1,25 @@
+services:
+  ros-noetic:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile.m1-noetic
+    container_name: lv_dot_m1
+    environment:
+      - DISPLAY=host.docker.internal:0
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_SOFTWARE=1
+    volumes:
+      - ./:/catkin_ws/src/LV-DOT
+      - catkin_build:/catkin_ws/build
+      - catkin_devel:/catkin_ws/devel
+      - catkin_logs:/catkin_ws/logs
+    working_dir: /catkin_ws
+    stdin_open: true
+    tty: true
+    command: bash -lc "source /opt/ros/noetic/setup.bash && tail -f /dev/null"
+
+volumes:
+  catkin_build:
+  catkin_devel:
+  catkin_logs:

@@ -1,0 +1,25 @@
+FROM --platform=linux/amd64 ros:noetic-desktop-full
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV ROS_WS=/catkin_ws
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3-pip \
+    python3-catkin-tools \
+    ros-noetic-vision-msgs \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --no-cache-dir ultralytics
+
+RUN mkdir -p ${ROS_WS}/src
+WORKDIR ${ROS_WS}
+
+COPY docker/m1/entrypoint.sh /ros_entrypoint_m1.sh
+RUN chmod +x /ros_entrypoint_m1.sh
+
+ENTRYPOINT ["/ros_entrypoint_m1.sh"]
+CMD ["bash"]
