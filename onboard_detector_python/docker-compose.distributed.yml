@@ -1,0 +1,46 @@
+# ══════════════════════════════════════════════════════════════
+# docker-compose.distributed.yml — Jetson ↔ Mac 분산 실행
+# ══════════════════════════════════════════════════════════════
+#
+# 전제조건:
+#   - Jetson에서 roscore가 실행 중이어야 합니다
+#   - Jetson과 Mac이 같은 LAN에 있어야 합니다
+#   - Docker Desktop 4.34+ (host networking 지원)
+#
+# 사용법:
+#   MAC_IP=<Mac LAN IP> JETSON_IP=<Jetson LAN IP> \
+#     docker compose -f docker-compose.distributed.yml up
+#
+# 예시:
+#   MAC_IP=192.168.0.10 JETSON_IP=192.168.0.20 \
+#     docker compose -f docker-compose.distributed.yml up
+#
+# ══════════════════════════════════════════════════════════════
+
+version: "3.8"
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: detector_server
+    network_mode: host
+    environment:
+      - ROS_MASTER_URI=http://${JETSON_IP:?Set JETSON_IP}:11311
+      - ROS_IP=${MAC_IP:?Set MAC_IP}
+      - ROS_HOSTNAME=${MAC_IP}
+    deploy:
+      resources:
+        limits:
+          cpus: "8"
+          memory: 16G
+        reservations:
+          cpus: "4"
+          memory: 8G
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"

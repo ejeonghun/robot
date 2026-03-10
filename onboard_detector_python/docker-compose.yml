@@ -1,0 +1,76 @@
+# ══════════════════════════════════════════════════════════════
+# docker-compose.yml — Distributed Obstacle Detection Server
+# ══════════════════════════════════════════════════════════════
+#
+# 사용법:
+#   1. 빌드:    docker compose build
+#   2. 실행:    docker compose up
+#   3. 백그라운드: docker compose up -d
+#   4. 로그:    docker compose logs -f server
+#   5. 중지:    docker compose down
+#
+# 네트워크 구성:
+#   - Jetson(로봇)과 Mac(서버)이 같은 네트워크에 있어야 합니다.
+#   - ROS_MASTER_URI를 Jetson의 roscore 주소로 설정하세요.
+#   - ROS_IP를 Mac의 네트워크 IP로 설정하세요.
+#
+# 포트:
+#   - 9001: rosbridge WebSocket (웹 기반 실시간 모니터링)
+#   - 11311: ROS Master (standalone 실행 시)
+# ══════════════════════════════════════════════════════════════
+
+version: "3.8"
+
+services:
+  # ── ROS Master (standalone 실행 시 사용) ──
+  roscore:
+    image: ros:noetic-ros-base
+    container_name: roscore
+    command: roscore
+    ports:
+      - "11311:11311"
+    networks:
+      - ros_net
+    restart: unless-stopped
+
+  # ── 서버 노드 (고성능 연산 + rosbridge WebSocket 모니터링) ──
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: detector_server
+    depends_on:
+      - roscore
+    environment:
+      # ── ROS 네트워크 설정 ──
+      # [단독 실행] 컨테이너 roscore 사용 시:
+      - ROS_MASTER_URI=http://roscore:11311
+      # [분산 실행] Jetson의 roscore에 연결 시 아래로 변경:
+      # - ROS_MASTER_URI=http://<JETSON_IP>:11311
+      - ROS_IP=0.0.0.0
+      - ROS_HOSTNAME=detector_server
+    ports:
+      # rosbridge WebSocket (웹 기반 실시간 모니터링)
+      - "9001:9001"
+    networks:
+      - ros_net
+    # M1 Pro 성능 최적화
+    deploy:
+      resources:
+        limits:
+          cpus: "8"
+          memory: 16G
+        reservations:
+          cpus: "4"
+          memory: 8G
+    restart: unless-stopped
+    # 실시간 로그 확인
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+networks:
+  ros_net:
+    driver: bridge
