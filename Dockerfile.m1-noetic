@@ -12,6 +12,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-catkin-tools \
     ros-noetic-vision-msgs \
     ros-noetic-tf2-sensor-msgs \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcb-xinerama0 \
+    libxkbcommon-x11-0 \
+    libgl1-mesa-glx \
+    libgl1-mesa-dri \
+    libglu1-mesa \
+    mesa-utils \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --no-cache-dir ultralytics
