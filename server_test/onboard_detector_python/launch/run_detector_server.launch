@@ -1,0 +1,28 @@
+<launch>
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- Server-Side Launch (Mac M1 Pro)                          -->
+    <!-- 고성능 연산 파이프라인: DBSCAN + KF + MOT + Classification  -->
+    <!-- rosbridge WebSocket on port 9001 for monitoring          -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <!-- 서버용 파라미터 로드 -->
+    <rosparam file="$(find onboard_detector_python)/cfg/detector_server_param.yaml"
+              ns="/onboard_detector" />
+
+    <!-- 서버 노드 실행 -->
+    <node pkg="onboard_detector_python"
+          type="detector_node_server.py"
+          name="onboard_detector_server"
+          output="screen"
+          respawn="false">
+    </node>
+
+    <!-- rosbridge WebSocket (포트 9001) — 웹 기반 실시간 모니터링 -->
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+        <arg name="port" value="9001" />
+    </include>
+
+    <!-- (선택) RViz 시각화 — 서버에서 디버깅할 때 활성화 -->
+    <!-- <node name="rviz" pkg="rviz" type="rviz"
+          args="-d $(find onboard_detector_python)/rviz/detector_lv.rviz"/> -->
+</launch>

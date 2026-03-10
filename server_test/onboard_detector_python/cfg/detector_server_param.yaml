@@ -1,0 +1,86 @@
+# ══════════════════════════════════════════════════════════════
+# Server-Side Configuration (Mac M1 Pro)
+# ══════════════════════════════════════════════════════════════
+# 이 파일은 서버(Mac M1 Pro)에서 실행될 때의 파라미터입니다.
+# Jetson 클라이언트의 detector_param.yaml과 토픽명이 일치해야 합니다.
+
+localization_mode: 1 # 0: pose (default) 1: odom
+
+# ROS Topics (Jetson에서 발행하는 토픽명과 일치 필요)
+depth_image_topic: /camera/depth/image_rect_raw
+color_image_topic: /camera/color/image_raw
+lidar_pointcloud_topic: /rslidar_points
+pose_topic: /robot_pose
+odom_topic: /odom_3d
+
+# Camera Parameters (Jetson과 동일)
+depth_intrinsics: [428.453125, 428.453125, 423.80810546875, 238.1770782470703] # fx, fy, cx, cy
+color_intrinsics: [641.2750244140625, 640.5534057617188, 645.3195190429688, 362.74615478515625]
+depth_scale_factor: 1000
+depth_min_value: 0.5
+depth_max_value: 5.0
+depth_filter_margin: 10
+depth_skip_pixel: 2
+image_cols: 848
+image_rows: 480
+
+# Sensor Transforms (Jetson과 동일)
+body_to_camera_depth: [0.0,  0.0,  1.0,  0.28,
+                      -1.0,  0.0,  0.0,  0.01,
+                       0.0, -1.0,  0.0,  0.115,
+                       0.0,  0.0,  0.0,  1.0]
+body_to_camera_color: [0.0,  0.0,  1.0,  0.28,
+                      -1.0,  0.0,  0.0,  -0.01,
+                       0.0, -1.0,  0.0,  0.115,
+                       0.0,  0.0,  0.0,  1.0]
+body_to_lidar:  [1.0,  0.0,  0.0,  0.0,
+                 0.0,  1.0,  0.0,  0.0,
+                 0.0,  0.0,  1.0,  0.22,
+                 0.0,  0.0,  0.0,  1.0]
+
+# System Timing
+# M1 Pro는 연산력이 높으므로 Jetson과 동일하거나 더 빠른 주기 설정 가능
+time_step: 0.033          # detection/lidar timer (30Hz target)
+tracking_time_step: 0.05  # tracking timer (20Hz)
+vis_time_step: 0.1        # visualization timer (10Hz)
+
+# DBSCAN Common
+ground_height: 0.2
+roof_height: 2.0
+
+# DBSCAN visual param
+voxel_occupied_thresh: 5
+dbscan_min_points_cluster: 30
+dbscan_search_range_epsilon: 0.05
+
+# DBSCAN LiDAR param
+lidar_DBSCAN_min_points: 10
+lidar_DBSCAN_epsilon: 0.05
+downsample_threshold: 3500
+gaussian_downsample_rate: 6
+
+# LiDAR Visual Filtering
+filtering_BBox_IOU_threshold: 0.2
+
+# Tracking and data association
+max_match_range: 0.5
+max_size_diff_range: 0.5
+feature_weight: [3.0, 3.0, 0.1, 0.5, 0.5, 0.05, 0, 0, 0]
+history_size: 100
+fix_size_history_threshold: 10
+fix_size_dimension_threshold: 0.4
+kalman_filter_param: [0.25, 0.01, 0.05, 0.05, 0.04, 0.3, 0.6]
+kalman_filter_averaging_frames: 10
+
+# Classification
+frame_skip: 5
+dynamic_velocity_threshold: 0.2
+dynamic_voting_threshold: 0.8
+frames_force_dynamic: 10
+frames_force_dynamic_check_range: 30
+dynamic_consistency_threshold: 15
+
+# Constrain size
+target_constrain_size: true
+target_object_size: [0.5, 0.5, 1.5]
+max_object_size: [3.0, 3.0, 2.0]

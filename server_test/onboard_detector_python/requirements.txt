@@ -1,0 +1,7 @@
+# Python Dependencies for Onboard Detector Server
+# M1 Pro (ARM64) compatible versions
+
+numpy>=1.21.0
+opencv-python-headless>=4.5.0
+scikit-learn>=1.0.0
+torch>=2.0.0
