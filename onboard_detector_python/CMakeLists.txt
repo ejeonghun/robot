@@ -44,6 +44,7 @@ catkin_install_python(
     src/onboard_detector_python/detector_node.py
     src/onboard_detector_python/fake_detector_node.py
     src/onboard_detector_python/detector_node_server.py
+    src/onboard_detector_python/detector_node_client.py
     scripts/yolo_detector/yolov11_detector_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
