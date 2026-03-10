@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # ── Python 패키지 설치 ──
 COPY requirements.txt /tmp/requirements.txt
 RUN pip3 install --no-cache-dir -r /tmp/requirements.txt && \
+    pip3 install --no-cache-dir ultralytics && \
     rm /tmp/requirements.txt
 
 # ── Catkin 워크스페이스 구성 ──

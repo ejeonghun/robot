@@ -1,0 +1,55 @@
+services:
+  roscore:
+    image: ros:noetic-ros-base
+    platform: linux/amd64
+    container_name: lvdot_roscore
+    command: roscore
+    networks:
+      - ros_net
+
+  server:
+    platform: linux/amd64
+    build:
+      context: ./server_test/onboard_detector_python
+      dockerfile: Dockerfile
+    container_name: lvdot_server
+    depends_on:
+      - roscore
+    environment:
+      - ROS_MASTER_URI=http://roscore:11311
+      - ROS_HOSTNAME=server
+      - ROS_IP=server
+    command: roslaunch onboard_detector_python run_detector_server.launch
+    networks:
+      - ros_net
+
+  client:
+    platform: linux/amd64
+    build:
+      context: ./server_test/onboard_detector_python
+      dockerfile: Dockerfile
+    container_name: lvdot_client
+    depends_on:
+      - roscore
+      - server
+    environment:
+      - ROS_MASTER_URI=http://roscore:11311
+      - ROS_HOSTNAME=client
+      - ROS_IP=client
+      - BAG_FILE=corridor_demo.bag
+    volumes:
+      - /Users/gwondoyeong/Downloads/robot_src/robot:/data/rosbags:ro
+    command: >
+      bash -lc "
+      source /opt/ros/noetic/setup.bash &&
+      source /catkin_ws/devel/setup.bash &&
+      roslaunch onboard_detector_python run_detector_client_docker.launch &
+      sleep 5 &&
+      rosbag play -l /data/rosbags/$${BAG_FILE}
+      "
+    networks:
+      - ros_net
+
+networks:
+  ros_net:
+    driver: bridge
