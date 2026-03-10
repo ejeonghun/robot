@@ -11,13 +11,14 @@ services:
       - LIBGL_ALWAYS_SOFTWARE=1
     volumes:
       - ./:/catkin_ws/src/LV-DOT
+      - /Users/gwondoyeong/Download/robot_src/robot:/data/rosbags:ro
       - catkin_build:/catkin_ws/build
       - catkin_devel:/catkin_ws/devel
       - catkin_logs:/catkin_ws/logs
     working_dir: /catkin_ws
     stdin_open: true
     tty: true
-    command: bash -lc "source /opt/ros/noetic/setup.bash && tail -f /dev/null"
+    command: bash -lc "source /opt/ros/noetic/setup.bash && source /catkin_ws/devel/setup.bash && roscore"
 
 volumes:
   catkin_build:

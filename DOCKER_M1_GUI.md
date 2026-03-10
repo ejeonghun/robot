@@ -34,11 +34,12 @@ source devel/setup.bash
 
 ## 3) 데모 실행
 
-컨테이너 내부에서 아래를 각각 다른 터미널(또는 tmux)로 실행:
-
+`docker compose up` 후 `roscore`는 자동 실행됩니다. 로그 확인:
 ```bash
-roscore
+docker compose -f docker-compose.m1.yml logs -f
 ```
+
+그 다음 컨테이너 내부에서 아래를 각각 다른 터미널(또는 tmux)로 실행:
 
 ```bash
 source /catkin_ws/devel/setup.bash
